@@ -1,4 +1,6 @@
 import pygame, random, sys, time
+from winsound import PlaySound, SND_FILENAME, SND_LOOP, SND_ASYNC # use winsound for async
+
 
 from Level import Level
 from Pacman import Pacman
@@ -11,10 +13,24 @@ TILE = 20
 OFFSET = 60
 gameOver = False  
 game = True
+gamePaused = False
+play = True
+# so that the fruits apper and disapper we need to keep track of time
+startTime = 0
+endTime = 0
 
-button = pygame.Rect(300,30,120,30)
+button = pygame.Rect(280,30,140,30)
+button1 = pygame.Rect(350,30,140,30)
+
 def reset():
     pass
+def victory():
+    pass
+def plays():
+    global play
+    PlaySound('Sounds\pacman_chomp.wav', SND_FILENAME|SND_LOOP|SND_ASYNC)
+    play = False
+    print('played')
 def renderText(font, txt, left, top, col):
     textobj = font.render(txt, 1, tuple(col))
     textrect = textobj.get_rect()
@@ -35,11 +51,12 @@ prect = pygame.Rect(355, 465, 30, 30)
 pacman = Pacman((355,465), level, prect)
 ghosts = [Ghost(pygame.Rect(350, 325, 35, 35), "Blinky", level.ids, level, pacman),Ghost(pygame.Rect(315, 400, 35, 35), "Pinky", level.ids, level, pacman),Ghost(pygame.Rect(350, 400, 35, 35),"Inky", level.ids, level, pacman), Ghost(pygame.Rect(380, 400, 35, 35),"Clyde", level.ids, level, pacman)]
 def colliderec(xvel, yvel): # column, row
+    if play == True:
+            plays()
     pacman.rect.x += xvel
     for sq in range(0, len(level.surfaces)):
         for x in level.surfaces[sq]:
             if pacman.rect.colliderect(x):
-                print(x, xvel)
                 if xvel < 0:  # We're moving to the left.
                     # Move the player out of the block.
                     pacman.rect.left = x.right
@@ -59,16 +76,14 @@ def colliderec(xvel, yvel): # column, row
     for pellet in level.circles:
         if pacman.rect.colliderect(pellet):
             row, column = level.getArrayCoords([pacman.rect.left, pacman.rect.top])
-            print(row, column, pacman.rect.left, pacman.rect.top)
             if level.map[column][row] == 'Q':
                 level.score += 10
             elif level.map[column][row] == 'O':
                 level.score += 50
                 level.scatterGhosts()
             elif level.map[column][row] == 'F':
-                fruitsound = pygame.mixer.Sound('Sounds\pacman_eatfruit.wav')
-                fruitsound.play()
-                if level.fruit == 'cherry':
+                PlaySound('Sounds\pacman_eatfruit.wav', SND_ASYNC)
+                if level.fruit == 'cherry': # dont do this! use an enum or dictonary instaed, this is bad programming. idk why i did it then lol
                     level.score += 100
                 if level.fruit == 'berry':
                     level.score += 300
@@ -80,6 +95,14 @@ def colliderec(xvel, yvel): # column, row
                     level.score += 1000
                 if level.fruit == 'galaxian':
                     level.score += 2000
+                if level.fruit == 'bell':
+                    level.score += 3000
+                if level.fruit == 'key':
+                    level.score += 5000
+                if level.fruit == 'poo':
+                    level.score += 6900
+                if level.fruit == 'crown':
+                    victory()
             if level.score > 10000 and level.extraLive == False:
                 level.lives += 'X'
                 level.extraLive = True
@@ -116,7 +139,6 @@ menubar = pygame.Rect(0, 0, WIDTH, OFFSET)
 mySound = pygame.mixer.Sound('Sounds\pacman_beginning.wav')
 image = pygame.image.load("Images\\pacman.png")
 image = pygame.transform.scale(image, (30, 30))
-i, j = level.getArrayCoords(pacman.pos)
 while not gameOver:
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (10,0,90), menubar)
@@ -127,7 +149,7 @@ while not gameOver:
 
     renderText(title,"Pacman",300, 3,(250,250,0))
     pygame.draw.rect(screen, (40, 200, 100), button)
-    renderText(font, "QUIT GAME", 320, 35, (255, 255, 255))
+    renderText(font, "QUIT GAME", 290, 35, (255, 255, 255))
     level.render()
     if starting:
         
@@ -145,11 +167,10 @@ while not gameOver:
                 if button.collidepoint(pos):
                     reset()
                     continue
-                #clicked(pos)
         if event.type == pygame.KEYDOWN:
+            
             if event.key == pygame.K_w: # change directions
                 pacman.direction = 'N'
-                print(pacman.direction)
             elif event.key == pygame.K_a:
                 pacman.direction = 'W'
             elif event.key == pygame.K_d:
@@ -157,11 +178,17 @@ while not gameOver:
             elif event.key == pygame.K_s:
                 pacman.direction = 'S'    
     if game == True and starting == False:
-        if str(level.map[j])[i] == 'Q':
-            l = list(level.map[j])
-            l[i] = 'N'
-            #level.map[i] = "".join(l)# 
-            #Note: Update code so that we have smooth tile movement! only change direction when the game detects an open area
+        i, j = level.getArrayCoords([pacman.rect.left, pacman.rect.top])
+        l = list(level.map[j])
+        l[i] = 'N'
+        #level.map[i] = "".join(l)# 
+        #Note: Update code so that we have smooth tile movement! only change direction when the game detects an open area
+        if level.map[j][i] == '2':
+            print(level.map)
+            pacman.rect = pygame.Rect(40, 400, 30, 30)
+        elif level.map[j][i] == '1':
+            print(0)
+            pacman.rect = pygame.Rect(600, 400, 30, 30)
         if pacman.direction == 'W' and not pygame.mixer.get_busy():
             colliderec(-pacman.speed-1, 0)
         elif pacman.direction == 'N' and not pygame.mixer.get_busy():

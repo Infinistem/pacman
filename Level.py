@@ -61,6 +61,21 @@ class Level:
         elif self.level == 4:
             self.fruit = 'melon'
             return pygame.image.load("Images\\melon.png")
+        elif self.level == 5:
+            self.fruit = 'galaxian'
+            return pygame.image.load("Images\\galaxian.png")
+        elif self.level == 6:
+            self.fruit = 'bell'
+            return pygame.image.load("Images\\bell.png")
+        elif self.level == 69:
+            self.fruit = 'poo'
+            return pygame.image.load("Images\\pootin.png")
+        elif self.level == 255: # i didnt want to recreate the famous 255 glicth so do do something for this level i made a proper ending
+            self.fruit == 'crown'
+            return pygame.image.load("Images\\crown.png")
+        else:
+            self.fruit = 'key'
+            return pygame.image.load("Images\\key.png")
     def scatterGhosts(self):
         pass
     def reset(self):
@@ -74,7 +89,7 @@ class Level:
          "NBBBBQBQBNBNBQBQBBBBN",
 		 "NNNNBNBQNNNNNQBNBNNNN",
 		 "BBBBBQBQBBHBBQBQBBBBB",
-		 "NNNNNNQQBGGGBQQNNNNNN",
+		 "1NNNNNQQBGGGBQQNNNNN2", 
 		 "BBBBBQBQBBBBBQBQBBBBB",
 		 "NNNNBQBNNNNNNNBQBNNNN",
 		 "NBBBBQBNBBBBBNBQBBBBN",
