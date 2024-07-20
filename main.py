@@ -57,20 +57,19 @@ def colliderec(xvel, yvel): # column, row
     for sq in range(0, len(level.surfaces)):
         for x in level.surfaces[sq]:
             if pacman.rect.colliderect(x):
-                if xvel < 0:  # We're moving to the left.
-                    # Move the player out of the block.
+                if xvel < 0:  
                     pacman.rect.left = x.right
-                elif xvel > 0:  # We're moving to the right.
+                elif xvel > 0: 
                      pacman.rect.right = x.left
                 break
     pacman.rect.y += yvel
     for sq in range(0, len(level.surfaces)):
         for x in level.surfaces[sq]:
             if pacman.rect.colliderect(x):
-                if yvel < 0:  # We're moving to the left.
-                    # Move the player out of the block.
+                if yvel < 0: 
+
                     pacman.rect.top = x.bottom
-                elif yvel > 0:  # We're moving to the right.
+                elif yvel > 0: 
                      pacman.rect.bottom = x.top
                 break
     for pellet in level.circles:
